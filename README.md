@@ -7,7 +7,7 @@ Modified to allow using two separate masks per object, one mask to select the ob
 ## Pre-requisites 
 1. OpenCV (pip install opencv-python)
 2. PIL (pip install Pillow)
-3. Poisson Blending (Follow instructions [here](https://github.com/yskmt/pb)
+3. Poisson Blending (Follow instructions [here](https://github.com/yskmt/pb))
 4. PyBlur (pip install pyblur, some modifications may be necessary, see PyBlur_notes.txt)
 5. PyAMG (pip install pyamg)
 

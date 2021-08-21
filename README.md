@@ -2,7 +2,7 @@
 
 This tool is adapted from [SynDataGeneration](https://github.com/debidatta/syndata-generation) by the authors of the [Cut, Paste and Learn: Surprisingly Easy Synthesis for Instance Detection](https://arxiv.org/pdf/1708.01642.pdf). The license for the original code is included in this repository. 
 
-Modified to allow using two separate masks per object, one mask to select the object pixels, another mask used to create the bounding box. Useful if you want to include certain objects pixels for context, but do not necessarily want to the bounding box to include the context pixels. 
+Modified to work with Python 3 and allow using two separate masks per object, one mask to select the object pixels, another mask used to create the bounding box. Useful if you want to include certain objects pixels for context, but do not necessarily want to the bounding box to include the context pixels. 
 
 ## Pre-requisites 
 1. OpenCV (pip install opencv-python)

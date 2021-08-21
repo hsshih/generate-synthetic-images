@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<annotation>
+    <filename>5_gaussian.jpg</filename>
+    <size>
+        <width>640</width>
+        <height>640</height>
+        <depth>3</depth>
+    </size>
+    <object>
+        <name>Siemens</name>
+        <bndbox>
+            <xmin>517</xmin>
+            <xmax>556</xmax>
+            <ymin>165</ymin>
+            <ymax>243</ymax>
+        </bndbox>
+        <difficult>0</difficult>
+    </object>
+    <object>
+        <name>AllenBradley</name>
+        <bndbox>
+            <xmin>371</xmin>
+            <xmax>387</xmax>
+            <ymin>553</ymin>
+            <ymax>576</ymax>
+        </bndbox>
+        <difficult>0</difficult>
+    </object>
+</annotation>

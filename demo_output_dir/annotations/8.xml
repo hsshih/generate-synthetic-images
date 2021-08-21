@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<annotation>
+    <filename>8_gaussian.jpg</filename>
+    <size>
+        <width>640</width>
+        <height>640</height>
+        <depth>3</depth>
+    </size>
+    <object>
+        <name>AllenBradley</name>
+        <bndbox>
+            <xmin>406</xmin>
+            <xmax>413</xmax>
+            <ymin>316</ymin>
+            <ymax>333</ymax>
+        </bndbox>
+        <difficult>0</difficult>
+    </object>
+    <object>
+        <name>AllenBradley</name>
+        <bndbox>
+            <xmin>505</xmin>
+            <xmax>523</xmax>
+            <ymin>471</ymin>
+            <ymax>494</ymax>
+        </bndbox>
+        <difficult>0</difficult>
+    </object>
+    <object>
+        <name>AllenBradley</name>
+        <bndbox>
+            <xmin>243</xmin>
+            <xmax>277</xmax>
+            <ymin>246</ymin>
+            <ymax>305</ymax>
+        </bndbox>
+        <difficult>0</difficult>
+    </object>
+</annotation>

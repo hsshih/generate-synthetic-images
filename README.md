@@ -8,7 +8,7 @@ Modified to allow using two separate masks per object, one mask to select the ob
 1. OpenCV (pip install opencv-python)
 2. PIL (pip install Pillow)
 3. Poisson Blending (Follow instructions [here](https://github.com/yskmt/pb)
-4. PyBlur (pip install pyblur)
+4. PyBlur (pip install pyblur, some modifications may be necessary, see PyBlur_notes.txt)
 5. PyAMG (pip install pyamg)
 
 To be able to generate scenes this code assumes you have the object masks for all images. There is no pre-requisite on what algorithm is used to generate these masks as for different applications different algorithms might end up doing a good job. 

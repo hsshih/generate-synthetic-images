@@ -41,7 +41,8 @@ optional arguments:
   --n_image NUM         Number of synthetic images to generate
   --dontocclude         Add objects without occlusion. Default is to produce occlusions
   --add_distractors     Add distractors objects. Default is to not use distractors
-  --separate_annot_mask Use separate annotation masks to produce bounding boxes. Assumes name of masks to be [ImageName]_annot.pbm
+  --separate_annot_mask Use separate annotation masks to produce bounding boxes. 
+                        Assumes name of masks to be [ImageName]_annot.pbm
 ```
 
 ## Training an object detector
@@ -53,7 +54,8 @@ The code produces all the files required to train an object detector. The output
 
 ## Helpful tools in the src directory
 - preprocess_image.py - Resize input images to squares with or without padding
-- mask_and_scale_image.py - Convert png outputs from CVAT to masks, resize masks and images, replace object background to prevent unnatural edges in synthesized images
+- mask_and_scale_image.py - Convert png outputs from CVAT to masks, resize masks and images, 
+                            replace object background to prevent unnatural edges in synthesized images
 - rotate_object_img_and_mask - Rotate object images and their corresponding masks
 - convert_xml_to_yolo.py - convert the XML annotation files to YOLO format. 
 

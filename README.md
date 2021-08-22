@@ -58,6 +58,8 @@ The code produces all the files required to train an object detector. The output
                             replace object background to prevent unnatural edges in synthesized images
 - rotate_object_img_and_mask - Rotate object images and their corresponding masks
 - convert_xml_to_yolo.py - convert the XML annotation files to YOLO format. 
+- convert_pred_yolo_to_xml.py - convert the predictions from YOLOv5 to XML files. Can be used after doing training and inference using the [Custom_YOLOv5_training notebook](https://github.com/hsshih/generate-synthetic-images/blob/main/Custom_YOLOv5_training.ipynb). 
+
 
 ## Demo Data
 

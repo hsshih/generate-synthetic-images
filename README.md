@@ -23,7 +23,7 @@ The other defaults refer to different image generating parameters that might be 
 ## Running the Script
 ```
 python dataset_generator2.py [-h] [--selected] [--scale] [--rotation]
-                            [--num NUM] [--dontocclude] [--add_distractors]
+                            [--num NUM] [--dontocclude] [--separate_box_mask] [--add_distractors] [--use_only_box_mask]
                             root exp
 
 Create dataset with different augmentations
@@ -41,8 +41,10 @@ optional arguments:
   --n_image NUM         Number of synthetic images to generate
   --dontocclude         Add objects without occlusion. Default is to produce occlusions
   --add_distractors     Add distractors objects. Default is to not use distractors
-  --separate_annot_mask Use separate annotation masks to produce bounding boxes. 
-                        Assumes name of masks to be [ImageName]_annot.pbm
+  --separate_box_mask   Use separate masks to produce bounding boxes. 
+                        Assumes name of masks to be [ImageName]_box.pbm
+  --use_only_box_mask   Use the bounding box masks to also mask object pixels. 
+                        Assumes name of masks to be [ImageName]_box.pbm
 ```
 
 ## Training an object detector
@@ -65,4 +67,4 @@ The code produces all the files required to train an object detector. The output
 
 Demo data set places images of two types of controllers on random electrical cabinet backgrounds. The demo output is generated using the following command. Note that the output does not override any existing folders and images. Check to make sure that the output directory does not exist before proceeding. 
 
-python dataset_generator2.py --n_image 10 --separate_annot_mask --dontocclude 'demo_data_dir/objects_dir' 'demo_output_dir'
+python dataset_generator2.py --n_image 10 --separate_box_mask --dontocclude 'demo_data_dir/objects_dir' 'demo_output_dir'

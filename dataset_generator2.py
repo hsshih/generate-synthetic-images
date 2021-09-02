@@ -115,20 +115,20 @@ def get_mask_file(img_file):
     return mask_file
     
     
-def get_annot_mask_file(img_file):
-    '''Takes an image file name and returns the corresponding annotation mask file. The mask represents
+def get_box_mask_file(img_file):
+    '''Takes an image file name and returns the corresponding bounding box mask file. The mask represents
        pixels in the object that should be used for the bounding box.
        This mask is only used to calculate the xmin, xmax, ymin, ymax for the .xml file
-       Default implentation assumes annotation mask file has same pathmas image file with different extension.
-       Write custom code for getting annotation mask file here if this is not the case.
+       Default implentation assumes bounding box mask file has same pathmas image file with different extension.
+       Write custom code for getting bounding box mask file here if this is not the case.
 
     Args:
         img_file(string): Image name
     Returns:
         string: Correpsonding mask file path
     '''
-    annot_mask_file = img_file.replace('.jpg','_annot.pbm')
-    return annot_mask_file
+    box_mask_file = img_file.replace('.jpg','_box.pbm')
+    return box_mask_file
     
 
 def get_labels(imgs):
@@ -257,12 +257,12 @@ def PIL2array3C(img):
     return np.array(img.getdata(),
                     np.uint8).reshape(img.size[1], img.size[0], 3)
 
-def create_image_anno_wrapper(args, w=WIDTH, h=HEIGHT, scale_augment=False, rotation_augment=False, blending_list=['none'], dontocclude=False, separate_annot_mask=False):
+def create_image_anno_wrapper(args, w=WIDTH, h=HEIGHT, scale_augment=False, rotation_augment=False, blending_list=['none'], dontocclude=False, separate_box_mask=False, use_only_box_mask=False):
    ''' Wrapper used to pass params to workers
    '''
-   return create_image_anno(*args, w=w, h=h, scale_augment=scale_augment, rotation_augment=rotation_augment, blending_list=blending_list, dontocclude=dontocclude, separate_annot_mask=separate_annot_mask)
+   return create_image_anno(*args, w=w, h=h, scale_augment=scale_augment, rotation_augment=rotation_augment, blending_list=blending_list, dontocclude=dontocclude, separate_box_mask=separate_box_mask, use_only_box_mask=use_only_box_mask)
 
-def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,  w=WIDTH, h=HEIGHT, scale_augment=False, rotation_augment=False, blending_list=['none'], dontocclude=False, separate_annot_mask=False):
+def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,  w=WIDTH, h=HEIGHT, scale_augment=False, rotation_augment=False, blending_list=['none'], dontocclude=False, separate_box_mask=False, use_only_box_mask=False):
     '''Add data augmentation, synthesizes images and generates annotations according to given parameters
 
     Args:
@@ -311,26 +311,38 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
         if dontocclude:
             already_syn = []
         for idx, obj in enumerate(all_objects):
+            
            foreground = Image.open(obj[0])
-           xmin, xmax, ymin, ymax = get_annotation_from_mask_file(get_mask_file(obj[0]))
-           if xmin == -1 or ymin == -1 or xmax-xmin < MIN_WIDTH or ymax-ymin < MIN_HEIGHT :
-               continue
-           foreground = foreground.crop((xmin, ymin, xmax, ymax))
-           orig_w, orig_h = foreground.size
-           mask_file =  get_mask_file(obj[0])
-           mask = Image.open(mask_file)
-           mask = mask.crop((xmin, ymin, xmax, ymax))
+            
+           if use_only_box_mask:
+               xmin, xmax, ymin, ymax = get_annotation_from_mask_file(get_box_mask_file(obj[0]))
+               if xmin == -1 or ymin == -1 or xmax-xmin < MIN_WIDTH or ymax-ymin < MIN_HEIGHT :
+                   continue
+               foreground = foreground.crop((xmin, ymin, xmax, ymax))
+               orig_w, orig_h = foreground.size
+               mask_file =  get_box_mask_file(obj[0])
+               mask = Image.open(mask_file)
+               mask = mask.crop((xmin, ymin, xmax, ymax))
+           else:
+               xmin, xmax, ymin, ymax = get_annotation_from_mask_file(get_mask_file(obj[0]))
+               if xmin == -1 or ymin == -1 or xmax-xmin < MIN_WIDTH or ymax-ymin < MIN_HEIGHT :
+                   continue
+               foreground = foreground.crop((xmin, ymin, xmax, ymax))
+               orig_w, orig_h = foreground.size
+               mask_file =  get_mask_file(obj[0])
+               mask = Image.open(mask_file)
+               mask = mask.crop((xmin, ymin, xmax, ymax))
            
-           if separate_annot_mask:
-               # Get the separate annotation mask file
-               mask_annot_file =  get_annot_mask_file(obj[0])
-               mask_annot = Image.open(mask_annot_file)
-               mask_annot = mask_annot.crop((xmin, ymin, xmax, ymax))
+           if separate_box_mask:
+               # Get the separate bounding box mask file
+               box_mask_file =  get_box_mask_file(obj[0])
+               box_mask = Image.open(box_mask_file)
+               box_mask = box_mask.crop((xmin, ymin, xmax, ymax))
            
            if INVERTED_MASK:
                mask = Image.fromarray(255-PIL2array1C(mask)).convert('1')
-               if separate_annot_mask:
-                    mask_annot = Image.fromarray(255-PIL2array1C(mask_annot)).convert('1')
+               if separate_box_mask:
+                    box_mask = Image.fromarray(255-PIL2array1C(box_mask)).convert('1')
                
            o_w, o_h = orig_w, orig_h
            if scale_augment:
@@ -341,8 +353,8 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
                         break
                 foreground = foreground.resize((o_w, o_h), Image.ANTIALIAS)
                 mask = mask.resize((o_w, o_h), Image.ANTIALIAS)
-                if separate_annot_mask:
-                    mask_annot = mask_annot.resize((o_w, o_h), Image.ANTIALIAS)
+                if separate_box_mask:
+                    box_mask = box_mask.resize((o_w, o_h), Image.ANTIALIAS)
             
            if rotation_augment:
                max_degrees = MAX_DEGREES  
@@ -350,19 +362,19 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
                    rot_degrees = random.randint(-max_degrees, max_degrees)
                    foreground_tmp = foreground.rotate(rot_degrees, expand=True)
                    mask_tmp = mask.rotate(rot_degrees, expand=True)
-                   if separate_annot_mask:
-                        mask_annot_tmp = mask_annot.rotate(rot_degrees, expand=True)
+                   if separate_box_mask:
+                        box_mask_tmp = box_mask.rotate(rot_degrees, expand=True)
                    o_w, o_h = foreground_tmp.size
                    if  w-o_w > 0 and h-o_h > 0:
                         break
                mask = mask_tmp
-               if separate_annot_mask:
-                        mask_annot = mask_annot_tmp
+               if separate_box_mask:
+                        box_mask = box_mask_tmp
                foreground = foreground_tmp
                
            xmin, xmax, ymin, ymax = get_annotation_from_mask(mask)
-           if separate_annot_mask:
-                xmin_annot, xmax_annot, ymin_annot, ymax_annot = get_annotation_from_mask(mask_annot)
+           if separate_box_mask:
+                xmin_box, xmax_box, ymin_box, ymax_box = get_annotation_from_mask(box_mask)
                 
            attempt = 0
            while True:
@@ -411,9 +423,9 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
            object_type_entry.text = str(object_type)
            object_bndbox_entry = SubElement(object_root, 'bndbox')
            
-           if separate_annot_mask:
-               # Set output coordinates according to annotation mask
-                xmin, xmax, ymin, ymax = xmin_annot, xmax_annot, ymin_annot, ymax_annot
+           if separate_box_mask:
+               # Set output coordinates according to bounding box mask
+                xmin, xmax, ymin, ymax = xmin_box, xmax_box, ymin_box, ymax_box
            
            x_min_entry = SubElement(object_bndbox_entry, 'xmin')
            x_min_entry.text = '%d'%(max(1,x+xmin))
@@ -438,7 +450,7 @@ def create_image_anno(objects, distractor_objects, img_file, anno_file, bg_file,
     with open(anno_file, "w") as f:
         f.write(xmlstr)
    
-def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_augment, dontocclude, add_distractors, n_image, separate_annot_mask):
+def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_augment, dontocclude, add_distractors, n_image, separate_box_mask,use_only_box_mask):
     '''Creates list of objects and distrctor objects to be pasted on what images.
        Spawns worker processes and generates images according to given params
 
@@ -450,7 +462,10 @@ def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_a
         scale_augment(bool): Add scale data augmentation
         rotation_augment(bool): Add rotation data augmentation
         dontocclude(bool): Generate images with occlusion
-        add_distractors(bool): Add distractor objects whose annotations are not required 
+        add_distractors(bool): Add distractor objects whose annotations are not required
+        n_image(int): The number of synthetic images to generate
+        separate_box_mask (bool): Use a separate mask for bounding box
+        use_only_box_mask (bool): Use the box mask for both bounding box and pixel mask
     '''
     w = WIDTH
     h = HEIGHT
@@ -505,7 +520,7 @@ def gen_syn_data(img_files, labels, img_dir, anno_dir, scale_augment, rotation_a
             img_files.append(img_file)
             anno_files.append(anno_file)
 
-    partial_func = partial(create_image_anno_wrapper, w=w, h=h, scale_augment=scale_augment, rotation_augment=rotation_augment, blending_list=BLENDING_LIST, dontocclude=dontocclude, separate_annot_mask=separate_annot_mask)
+    partial_func = partial(create_image_anno_wrapper, w=w, h=h, scale_augment=scale_augment, rotation_augment=rotation_augment, blending_list=BLENDING_LIST, dontocclude=dontocclude, separate_box_mask=separate_box_mask, use_only_box_mask=use_only_box_mask)
     p = Pool(NUMBER_OF_WORKERS, init_worker)
     try:
         p.map(partial_func, params_list)
@@ -526,7 +541,7 @@ def init_worker():
 def generate_synthetic_dataset(args):
     ''' Generate synthetic dataset according to given args
     '''
-    img_files = get_list_of_images(args.root, args.num) 
+    img_files = get_list_of_images(args.root)
     labels = get_labels(img_files)
 
     if args.selected:
@@ -544,7 +559,7 @@ def generate_synthetic_dataset(args):
     if not os.path.exists(os.path.join(img_dir)):
         os.makedirs(img_dir)
     
-    syn_img_files, anno_files = gen_syn_data(img_files, labels, img_dir, anno_dir, args.scale, args.rotation, args.dontocclude, args.add_distractors, args.n_image, args.separate_annot_mask)
+    syn_img_files, anno_files = gen_syn_data(img_files, labels, img_dir, anno_dir, args.scale, args.rotation, args.dontocclude, args.add_distractors, args.n_image, args.separate_box_mask, args.use_only_box_mask)
     write_imageset_file(args.exp, syn_img_files, anno_files)
 
 def parse_args():
@@ -561,14 +576,14 @@ def parse_args():
       help="Add scale augmentation.Default is to add scale augmentation.", action="store_false")
     parser.add_argument("--rotation",
       help="Add rotation augmentation.Default is to add rotation augmentation.", action="store_false")
-    parser.add_argument("--num",
-      help="Number of times each image will be in dataset", default=1, type=int)
     parser.add_argument("--dontocclude",
       help="Add objects without occlusion. Default is to produce occlusions", action="store_true")
     parser.add_argument("--add_distractors",
       help="Add distractors objects. Default is to not use distractors", action="store_true")
-    parser.add_argument("--separate_annot_mask",
-      help="Use a separate mask file names [imagefile]_annot.pbm to create bounding box for xml files, default is to not use a separate mask", action="store_true")
+    parser.add_argument("--separate_box_mask",
+      help="Use a separate mask file names [imagefile]_box.pbm to create bounding box for xml files, default is to not use a separate mask", action="store_true")
+    parser.add_argument("--use_only_box_mask",
+      help="Use a the bounding box mask, [imagefile]_box.pbm, to create bounding box and pixel mask, default is to not use this option", action="store_true")
     parser.add_argument("--n_image",
       help="Number of synthetic images to generate", default=10, type=int)
     args = parser.parse_args()

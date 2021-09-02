@@ -30,8 +30,8 @@ Create dataset with different augmentations
 
 positional arguments:
   root               The root directory which contains the images and annotations. 
-                     Masks are assumed to have be named [ImageName].pbm
-                     Masks for producing bounding boxes (if used) are assumed to have be named [ImageName]_box.pbm
+                     Masks are assumed to be named [ImageName].pbm
+                     Masks for producing bounding boxes (if used) are assumed to be named [ImageName]_box.pbm
                      
   exp                The directory where images and annotation lists will be created.
 

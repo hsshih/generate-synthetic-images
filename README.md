@@ -23,13 +23,16 @@ The other defaults refer to different image generating parameters that might be 
 ## Running the Script
 ```
 python dataset_generator2.py [-h] [--selected] [--scale] [--rotation]
-                            [--num NUM] [--dontocclude] [--separate_box_mask] [--add_distractors] [--use_only_box_mask]
-                            root exp
+                            [--num NUM] [--dontocclude] [--separate_box_mask] 
+                            [--add_distractors] [--use_only_box_mask] root exp
 
 Create dataset with different augmentations
 
 positional arguments:
-  root               The root directory which contains the images and annotations. Masks are assumed to have be named [ImageName].pbm
+  root               The root directory which contains the images and annotations. 
+                     Masks are assumed to have be named [ImageName].pbm
+                     Masks for producing bounding boxes (if used) are assumed to have be named [ImageName]_box.pbm
+                     
   exp                The directory where images and annotation lists will be created.
 
 optional arguments:
@@ -43,8 +46,28 @@ optional arguments:
   --add_distractors     Add distractors objects. Default is to not use distractors
   --separate_box_mask   Use separate masks to produce bounding boxes. 
                         Assumes name of masks to be [ImageName]_box.pbm
+                        If not used, the [ImageName].pbm masks will be used to produce bounding box
   --use_only_box_mask   Use the bounding box masks to also mask object pixels. 
-                        Assumes name of masks to be [ImageName]_box.pbm
+             
+             
+Sample folder structure for images:
+data_dir
+├── backgrounds
+│   ├── background_0.jpg
+│   └── background_1.jpg
+├── distractor_objects_dir
+│   └── Distractor1
+│       ├── distractor0.jpg
+│       └── distractor1.jpg
+├── neg_list.txt
+├── objects_dir
+│   ├── Object1
+│   │   ├── Object1_0.jpg
+│   │   └── Object1_1.jpg
+│   └── Object2
+│       ├── Object2_0.jpg
+│       └── Object2_1.jpg
+└── selected.txt
 ```
 
 ## Training an object detector

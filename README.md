@@ -22,16 +22,16 @@ The other defaults refer to different image generating parameters that might be 
 
 ## Running the Script
 ```
-python dataset_generator2.py [-h] [--selected] [--scale] [--rotation]
-                            [--num NUM] [--dontocclude] [--separate_box_mask] 
+python dataset_generator.py [-h] [--selected] [--scale] [--rotation]
+                            [-n_image NUM] [--dontocclude] [--separate_box_mask] 
                             [--add_distractors] [--use_only_box_mask] root exp
 
 Create dataset with different augmentations
 
 positional arguments:
   root               The root directory which contains the images and annotations. 
-                     Masks are assumed to be named [ImageName].pbm
-                     Masks for producing bounding boxes (if used) are assumed to be named [ImageName]_box.pbm
+                     Masks are assumed to have be named [ImageName].pbm
+                     Masks for producing bounding boxes (if used) are assumed to have be named [ImageName]_box.pbm
                      
   exp                The directory where images and annotation lists will be created.
 
@@ -40,7 +40,6 @@ optional arguments:
   --selected            Keep only selected instances in the test dataset. Default is to keep all instances in the root directory.
   --scale               Do not scale augmentation. Default is to add scale augmentation.
   --rotation            Do not rotation augmentation. Default is to add rotation augmentation.
-  --num NUM             Number of times each image will be in dataset
   --n_image NUM         Number of synthetic images to generate
   --dontocclude         Add objects without occlusion. Default is to produce occlusions
   --add_distractors     Add distractors objects. Default is to not use distractors
@@ -50,7 +49,8 @@ optional arguments:
   --use_only_box_mask   Use the bounding box masks to also mask object pixels. 
              
              
-Sample folder structure for images:
+Sample folder/file structure for images ([ImageName]_box.pbm files not necessary if not using separate masks for bounding boxes):
+
 data_dir
 ├── backgrounds
 │   ├── background_0.jpg
@@ -58,15 +58,25 @@ data_dir
 ├── distractor_objects_dir
 │   └── Distractor1
 │       ├── distractor0.jpg
-│       └── distractor1.jpg
+│       ├── distractor0.pbm
+│       ├── distractor1.jpg
+│       └── distractor1.pbm
 ├── neg_list.txt
 ├── objects_dir
 │   ├── Object1
-│   │   ├── Object1_0.jpg
-│   │   └── Object1_1.jpg
+≈ Object1_0.jpg
+│   │   ├── Object1_0.pbm
+│   │   ├── Object1_0_box.pbm
+│   │   ├── Object1_1.jpg
+│   │   ├── Object1_1.pbm
+│   │   └── Object1_1_box.pbm
 │   └── Object2
 │       ├── Object2_0.jpg
-│       └── Object2_1.jpg
+│       ├── Object2_0.pbm
+│       ├── Object2_0_box.pbm
+│       ├── Object2_1.jpg
+│       ├── Object2_1.pbm
+│       └── Object2_1_box.pbm
 └── selected.txt
 ```
 

@@ -22,7 +22,7 @@ The other defaults refer to different image generating parameters that might be 
 
 ## Running the Script
 ```
-python dataset_generator.py [-h] [--selected] [--scale] [--rotation]
+python dataset_generator2.py [-h] [--selected] [--scale] [--rotation]
                             [-n_image NUM] [--dontocclude] [--separate_box_mask] 
                             [--add_distractors] [--use_only_box_mask] root exp
 
